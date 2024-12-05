@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Admin Dashboard - {{admin.name}}</h1>
+
+    <!-- Display all users -->
+    <!-- <h2>All Users</h2>
+    <ul>
+        {% for user in users %}
+            <li>
+                <a href="?user_id={{ user.id }}">{{ user.username }}</a>
+            </li>
+        {% endfor %}
+    </ul> -->
+
+
+    <h2>Users with  Closed Queries</h2>
+<ul>
+    {% for user in users_with_closed_queries %}
+        <li><a href="?user_id={{ user.id }}">{{ user.username }}</a></li>
+    {% empty %}
+        <p>No users with all queries closed.</p>
+    {% endfor %}
+</ul>
+
+
+    <h2>Users with Open Queries</h2>
+<ul>
+    {% for user in users_with_open_queries %}
+        <li>
+            <a href="?user_id={{ user.id }}">{{ user.username }}</a>
+        </li>
+    {% empty %}
+        <p>No users with open queries at the moment.</p>
+    {% endfor %}
+</ul>
+
+    {% if selected_user %}
+        <h2>Queries and Responses for {{ selected_user.username }}</h2>
+
+        {% for query in user_queries %}
+            <div>
+                <p><strong>Q: </strong>{{ query.question }} <em>({{ query.created_at|date:"d M Y, H:i" }})</em></p>
+                <ul>
+                    {% for response in responses %}
+                        {% if response.query == query %}
+                            <li>
+                                <strong>A: </strong>{{ response.answer }} <em>(by Admin {{ response.admin.username }} on {{ response.created_at|date:"d M Y, H:i" }})</em>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+
+
+                <!-- Form for responding to open queries -->
+                {% if query.status == 'open' %}
+                    <h3>Respond to this Query</h3>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <textarea name="answer" rows="4" cols="50" placeholder="Write your response here..."></textarea><br>
+                        <input type="hidden" name="query_id" value="{{ query.id }}">
+                        <button type="submit">Send Response</button>
+                    </form>
+                {% endif %}
+            </div>
+            <hr>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>

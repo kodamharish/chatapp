@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <style>
+        .query-response {
+            margin-bottom: 20px;
+        }
+        .query {
+            font-weight: bold;
+        }
+        .response {
+            margin-left: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome {{user.name}} - <a href="{% url 'logout_user' %}"><small>Logout</small></a></h1>
+
+        <!-- Query Submission -->
+        <form method="POST">
+            {% csrf_token %}
+            <textarea name="question" rows="4" cols="50" placeholder="Enter your query here..." required></textarea><br>
+            <button type="submit">Submit Query</button>
+        </form>
+
+        <!-- Query and Responses -->
+        <div>
+            <h3>Your Queries</h3>
+            {% for query in queries %}
+                <div class="query-response">
+                    <p class="query">Q: {{ query.question }} <small>({{ query.created_at|date:"d M Y, H:i" }})</small></p>
+                    {% if query.responses.exists %}
+                        {% for response in query.responses.all %}
+                            <p class="response">A: {{ response.answer }} (by Admin {{ response.admin.username }} on {{ response.created_at|date:"d M Y, H:i" }})</p>
+                        {% endfor %}
+                    {% else %}
+                        <p class="response">No response yet.</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
